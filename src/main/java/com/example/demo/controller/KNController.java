@@ -80,4 +80,25 @@ public class KNController {
 
         return ResponseEntity.ok().body(response);
     }
+
+    @DeleteMapping("/")
+    public ResponseEntity<?> deleteKN(@RequestBody KNDTO dto) {
+        try {
+            String temporarUserId = "LEEKYUMIN";
+
+            knittingNeedleEntity entity = KNDTO.toEntity(dto);
+
+            entity.setUserId(temporarUserId);
+
+            List<knittingNeedleEntity> entities = knService.deleteKN(entity);
+
+            ResponseDTO<KNDTO> response = ResponseDTO.<KNDTO>builder().data(dtos).build();
+
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            String error = e.getMessage();
+            ResponseDTO<KNDTO> response = ResponseDTO.<KNDTO>builder().error(error).build();
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 }

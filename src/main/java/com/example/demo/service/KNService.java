@@ -55,6 +55,20 @@ public class KNService {
         return retrieve(entity.getUserId());
     }
 
+    public List<knittingNeedleEntity> deleteKN(final knittingNeedleEntity entity) {
+        validate(entity);
+
+        try {
+            knRepository.delete(entity);
+        }
+        catch (Exception e) {
+            log.error("error deleting entity  ", entity.getId(), e);
+            throw new RuntimeException("error deleting entity " + entity.getId());
+        }
+
+        return retrieve(entity.getUserId());
+    }
+
     public void validate(final knittingNeedleEntity entity) {
         if(entity.getTitle() == null) {
             log.warn("Entity title cannot be null");
