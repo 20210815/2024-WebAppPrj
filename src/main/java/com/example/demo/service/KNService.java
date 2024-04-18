@@ -17,7 +17,7 @@ public class KNService {
 
 
     public List<knittingNeedleEntity> create(final knittingNeedleEntity entity) {
-        //맞게 들어온 정보들인지 확인
+        //맞게 들어온 정보들인지 확인 //각 컬럼에 null이 없는지 확인
         validate(entity);
         
         //후에, repository에 저장
@@ -31,9 +31,20 @@ public class KNService {
     }
 
     public void validate(final knittingNeedleEntity entity) {
+        if(entity.getTitle() == null) {
+            log.warn("Entity title cannot be null");
+            throw new RuntimeException("Entity title cannot be null");
+        }
+
         if(entity == null) {
             log.warn("Entity cannot be null");
             throw new RuntimeException("Entity cannot be null");
+        }
+
+
+        if(entity.getPrice() == null) {
+            log.warn("Entity price cannot be null");
+            throw new RuntimeException("Entity price cannot be null");
         }
 
         if(entity.getUserId() == null) {
