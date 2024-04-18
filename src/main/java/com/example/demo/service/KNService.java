@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -32,6 +33,26 @@ public class KNService {
 
     public List<knittingNeedleEntity> searchByTitle(String title) {
         return knRepository.findAllByTitleContaining(title);
+    }
+
+    public List<knittingNeedleEntity> retrieve (final String userId) {
+        return knRepository.findByUserId(userId);
+    }
+
+    public List<knittingNeedleEntity> updateKN(final knittingNeedleEntity entity) {
+        validate(entity);
+
+        final Optional<knittingNeedleEntity> original = knRepository.findById(entity.getId());
+        log.info("Entity id: {} is get", entity.getId());
+
+        original.ifPresent( kn -> {
+            kn.setTitle(entity.getTitle());
+            kn.setPrice(entity.getPrice());
+
+            knRepository.save(kn);
+        });
+
+        return retrieve(entity.getUserId());
     }
 
     public void validate(final knittingNeedleEntity entity) {

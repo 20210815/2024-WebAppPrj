@@ -7,6 +7,7 @@ import com.example.demo.service.KNService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,6 +60,23 @@ public class KNController {
         List<KNDTO> kndtos = entities.stream().map(KNDTO::new).collect(Collectors.toList());
 
         ResponseDTO<KNDTO> response = ResponseDTO.<KNDTO>builder().data(kndtos).build();
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PutMapping("/")
+    public ResponseEntity<?> updateKN(@RequestBody KNDTO kndto) {
+        String temporaryUserId = "LEEKYUMIN";
+
+        knittingNeedleEntity entity = KNDTO.toEntity(kndto);
+
+        entity.setUserId(temporaryUserId);
+
+        List<knittingNeedleEntity> entities = knService.updateKN(entity);
+
+        List<KNDTO> dtos = entities.stream().map(KNDTO::new).collect(Collectors.toList());
+
+        ResponseDTO<KNDTO> response = ResponseDTO.<KNDTO>builder().data(dtos).build();
 
         return ResponseEntity.ok().body(response);
     }
