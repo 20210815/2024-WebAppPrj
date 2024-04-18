@@ -9,5 +9,7 @@ import java.util.List;
 @Repository
 public interface KNRepository extends JpaRepository<knittingNeedleEntity, String> {
 
-    public List<knittingNeedleEntity> findByUserId(String userId);
+    List<knittingNeedleEntity> findByUserId(String userId);
+
+    List<knittingNeedleEntity> findAllByTitleContaining(String title);
 }

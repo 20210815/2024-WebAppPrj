@@ -6,10 +6,7 @@ import com.example.demo.model.knittingNeedleEntity;
 import com.example.demo.service.KNService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,5 +48,18 @@ public class KNController {
             ResponseDTO<KNDTO> response = ResponseDTO.<KNDTO>builder().error(error).build();
             return ResponseEntity.badRequest().body(response);
         }
+    }
+
+    @GetMapping("/{title}")
+    public ResponseEntity<?> searchByTitle(@PathVariable String title) {
+        //해당 title이 포함된 모든 entity를 list로 가져옴.
+        List<knittingNeedleEntity> entities = knService.searchByTitle(title);
+
+        //해당 entity list를 -> dto로 변환해줌
+        List<KNDTO> kndtos = entities.stream().map(KNDTO::new).collect(Collectors.toList());
+
+        ResponseDTO<KNDTO> response = ResponseDTO.<KNDTO>builder().data(kndtos).build();
+
+        return ResponseEntity.ok().body(response);
     }
 }

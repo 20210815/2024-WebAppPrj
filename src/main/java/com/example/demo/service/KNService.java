@@ -30,6 +30,10 @@ public class KNService {
         return knRepository.findByUserId(entity.getUserId());
     }
 
+    public List<knittingNeedleEntity> searchByTitle(String title) {
+        return knRepository.findAllByTitleContaining(title);
+    }
+
     public void validate(final knittingNeedleEntity entity) {
         if(entity.getTitle() == null) {
             log.warn("Entity title cannot be null");
