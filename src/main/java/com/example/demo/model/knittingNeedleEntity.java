@@ -20,6 +20,7 @@ public class knittingNeedleEntity {
     @GenericGenerator(name="system-uuid", strategy = "uuid")
     private String id; //제품 아이디
 
+    private String brand; // 뜨개 바늘 브랜드
     private String title; // 뜨개 바늘 이름
     private Integer price; // 뜨개 바늘 가격
     private String userId; // 판매인

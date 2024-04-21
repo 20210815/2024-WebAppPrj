@@ -92,6 +92,8 @@ public class KNController {
 
             List<knittingNeedleEntity> entities = knService.deleteKN(entity);
 
+            List<KNDTO> dtos = entities.stream().map(KNDTO::new).collect(Collectors.toList());
+
             ResponseDTO<KNDTO> response = ResponseDTO.<KNDTO>builder().data(dtos).build();
 
             return ResponseEntity.ok().body(response);
