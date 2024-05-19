@@ -13,6 +13,7 @@ public class KNDTO {
     private String title;
     private Integer price;
     private String brand;
+    private String userId;
 
 
     public KNDTO(final knittingNeedleEntity entity) {
@@ -20,6 +21,7 @@ public class KNDTO {
         this.title = entity.getTitle();
         this.price = entity.getPrice();
         this.brand = entity.getBrand();
+        this.userId = entity.getUserId();
     }
 
     public static knittingNeedleEntity toEntity(final KNDTO dto) {
@@ -28,6 +30,7 @@ public class KNDTO {
                 .title(dto.getTitle())
                 .price(dto.getPrice())
                 .brand(dto.getBrand())
+                .userId(dto.getUserId())
                 .build();
     }
 }

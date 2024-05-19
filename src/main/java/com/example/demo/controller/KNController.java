@@ -4,15 +4,16 @@ import com.example.demo.dto.KNDTO;
 import com.example.demo.dto.ResponseDTO;
 import com.example.demo.model.knittingNeedleEntity;
 import com.example.demo.service.KNService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@Slf4j
 @RequestMapping("KN")
 public class KNController {
 
@@ -23,15 +24,8 @@ public class KNController {
     @PostMapping("/")
     public ResponseEntity<?> createKN(@RequestBody KNDTO dto) {
         try {
-            //userid 설정
-            String temporaryUserId = "LEEKYUMIN";
-
             //request로 들어온 dto를 entity로 변경
             knittingNeedleEntity entity = KNDTO.toEntity(dto);
-
-            //객체를 만들면서 id가 생성되므로 일단 null로 설정
-            entity.setId(null);
-            entity.setUserId(temporaryUserId);
 
             //service를 통해 entity에 저장 <- return은 여태 저장된 모든 상품 entity를 list로 받음
             List<knittingNeedleEntity> entities = knService.create(entity);
@@ -51,10 +45,10 @@ public class KNController {
         }
     }
 
-    @GetMapping("/{title}")
-    public ResponseEntity<?> searchByTitle(@PathVariable String title) {
-        //해당 title이 포함된 모든 entity를 list로 가져옴.
-        List<knittingNeedleEntity> entities = knService.searchByTitle(title);
+    @GetMapping("/")
+    public ResponseEntity<?> retrieveAll() {
+        try {
+        List<knittingNeedleEntity> entities = knService.retrieve("LEEKYUMIN");
 
         //해당 entity list를 -> dto로 변환해줌
         List<KNDTO> kndtos = entities.stream().map(KNDTO::new).collect(Collectors.toList());
@@ -63,14 +57,39 @@ public class KNController {
 
         return ResponseEntity.ok().body(response);
     }
+        catch (Exception e) {
+        String error = e.getMessage();
+        ResponseDTO<KNDTO> response = ResponseDTO.<KNDTO>builder().error(error).build();
+        return ResponseEntity.badRequest().body(response);}
+
+    }
+
+    @GetMapping("/{title}")
+    public ResponseEntity<?> searchByTitle(@PathVariable String title) {
+        log.info(title+"search");
+
+        try {
+            //해당 title의 entity를 가져옴.
+            knittingNeedleEntity entity = knService.searchByTitle(title);
+
+            //해당 entity를 -> dto로 변환해줌
+            KNDTO kndto = new KNDTO(entity);
+
+            ResponseDTO<KNDTO> response = ResponseDTO.<KNDTO>builder().data((List<KNDTO>) kndto).build();
+
+            return ResponseEntity.ok().body(response);
+        }
+        catch (Exception e) {
+            String error = e.getMessage();
+            ResponseDTO<KNDTO> response = ResponseDTO.<KNDTO>builder().error(error).build();
+            return ResponseEntity.badRequest().body(response);
+        }
+
+    }
 
     @PutMapping("/")
     public ResponseEntity<?> updateKN(@RequestBody KNDTO kndto) {
-        String temporaryUserId = "LEEKYUMIN";
-
         knittingNeedleEntity entity = KNDTO.toEntity(kndto);
-
-        entity.setUserId(temporaryUserId);
 
         List<knittingNeedleEntity> entities = knService.updateKN(entity);
 
@@ -81,16 +100,10 @@ public class KNController {
         return ResponseEntity.ok().body(response);
     }
 
-    @DeleteMapping("/")
-    public ResponseEntity<?> deleteKN(@RequestBody KNDTO dto) {
+    @DeleteMapping("/{title}")
+    public ResponseEntity<?> deleteKN(@PathVariable String title) {
         try {
-            String temporarUserId = "LEEKYUMIN";
-
-            knittingNeedleEntity entity = KNDTO.toEntity(dto);
-
-            entity.setUserId(temporarUserId);
-
-            List<knittingNeedleEntity> entities = knService.deleteKN(entity);
+            List<knittingNeedleEntity> entities = knService.deleteKN(title);
 
             List<KNDTO> dtos = entities.stream().map(KNDTO::new).collect(Collectors.toList());
 

@@ -5,6 +5,7 @@ import com.example.demo.repository.KNRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,8 +32,15 @@ public class KNService {
         return knRepository.findByUserId(entity.getUserId());
     }
 
-    public List<knittingNeedleEntity> searchByTitle(String title) {
-        return knRepository.findAllByTitleContaining(title);
+    public knittingNeedleEntity searchByTitle(String title) {
+        final Optional<knittingNeedleEntity> entity = knRepository.findByTitle(title);
+
+        if (entity.isEmpty()) {
+            log.warn("no result");
+            throw new RuntimeException("no result");
+        }
+        log.info("search result", entity);
+        return entity.get();
     }
 
     public List<knittingNeedleEntity> retrieve (final String userId) {
@@ -48,6 +56,8 @@ public class KNService {
         original.ifPresent( kn -> {
             kn.setTitle(entity.getTitle());
             kn.setPrice(entity.getPrice());
+            kn.setBrand(entity.getBrand());
+            kn.setUserId(entity.getUserId());
 
             knRepository.save(kn);
         });
@@ -55,24 +65,29 @@ public class KNService {
         return retrieve(entity.getUserId());
     }
 
-    public List<knittingNeedleEntity> deleteKN(final knittingNeedleEntity entity) {
-        validate(entity);
+    @Transactional
+    public List<knittingNeedleEntity> deleteKN(final String title) {
 
         try {
-            knRepository.delete(entity);
+            knRepository.deleteByTitle(title);
         }
         catch (Exception e) {
-            log.error("error deleting entity  ", entity.getId(), e);
-            throw new RuntimeException("error deleting entity " + entity.getId());
+            log.error("error deleting entity title:  ", title, e);
+            throw new RuntimeException("error deleting entity title:" + title);
         }
 
-        return retrieve(entity.getUserId());
+        return retrieve("LEEKYUMIN");
     }
 
     public void validate(final knittingNeedleEntity entity) {
         if(entity.getTitle() == null) {
             log.warn("Entity title cannot be null");
             throw new RuntimeException("Entity title cannot be null");
+        }
+
+        if(entity.getBrand() == null) {
+            log.warn("Entity brand cannot be null");
+            throw new RuntimeException("Entity brand cannot be null");
         }
 
         if(entity == null) {
